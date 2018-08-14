@@ -5,7 +5,29 @@ body {
     margin: 0;
     font-family: "Lato", sans-serif;
 }
+
+.start-container {
+    width: 100vw;
+    height: 100vh;
+    background-color: #4e937a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn {
+    width: 15vw;
+    height: 5vh;
+    border: 1px solid #ffffff;
+    border-radius: 4%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .container {
+    width: 100vw;
+    height: 100vh;
     padding: 25px calc((100vw - 960px) / 2);
 }
 .container:first-child {

@@ -85,46 +85,67 @@ $(document).ready(function() {
 
     // If user clicks game area, make big explosive ball ("user-click") appear
     $("#game").click(function(event) {
-        console.log(event);
+        // console.log(event);
         // get mouse coordinate
-        console.log("pageX: " + event.offsetY + ", pageY: " + event.offsetX);
+        // console.log("pageX: " + event.offsetY + ", pageY: " + event.offsetX);
         // append div into html, only if no clicker exists, yet!
 
+        var clickerDiv = $('<div class="user-click"></div>');
         // console.log("clickerBool before if else " + clickerBool);
         if (clickerBool === true) {
             // append div into html
-            var clicker = $('<div class="user-click"></div>');
-            clicker.css({
+            clickerDiv.css({
                 // substract 10, because of the radius of the ball!
                 // TODO - Access width/height of css to make it dynamic!
                 top: event.offsetY - 10 + "px",
                 left: event.offsetX - 10 + "px"
             });
-            $("#game").append(clicker);
+            $("#game").append(clickerDiv);
             // set clickerBool to false, to prevent further creation of "user-clicks"
             clickerBool = false;
             // console.log("clickerBool within if else " + clickerBool);
         }
         clickerBool = false;
         // console.log("clickerBool after if else " + clickerBool);
+        setInterval(function() {
+            var nextVar = document.getElementsByClassName("user-click")[0].getBoundingClientRect();
+            console.log(nextVar);
+        }, 200);
+        console.log(game.balls);
+        // remember to do if statement and let setInterval only check for width, if clicker ball exists!!!!
+        // if it exists, check for coordinates and check if small ball collides
+        // if yes, then make small ball grow
+        // check if other ball collides...
+        // All small balls are in the array game!
+        //
+
+        // var nextVar = clickerDiv.getBoundingClientRect();
 
         // Animate clicker ball to grow
-        var clicker = $(".user-click");
+        var clickerStyle = $(".user-click");
         setTimeout(function() {
-            clicker.toggleClass("grow");
-            var rect = clicker.getBBox();
-            console.log(rect);
+            clickerStyle.toggleClass("grow");
+            // clickerDiv.getBoundingClientRect();
+            // var rect = clicker.getBBox();
+            // console.log(rect);
         }, 20);
         setTimeout(function() {
-            clicker.toggleClass("grow");
-            var rect = clicker.getBBox();
-            console.log(rect);
+            clickerStyle.toggleClass("grow");
+            // clickerDiv.getBoundingClientRect();
+            // var rect = clicker.getBBox();
+            // console.log(rect);
         }, 8000);
         setTimeout(function() {
-            clicker.toggleClass("fade-out");
-            var rect = clicker.getBBox();
-            console.log(rect);
+            clickerStyle.toggleClass("fade-out");
+            // clickerStyle.remove();
+            // clickerDiv.getBoundingClientRect();
+            // var rect = clicker.getBBox();
+            // console.log(rect);
         }, 10500);
+        // clickerDiv.getBoundingClientRect();
+
+        // inspect of clicker element shows, that element is growing - but not css values
+        // console.log of clicker element to research which properties it has - offsetWidth might be what to look for
 
         // store circumference of clicker in real-time, to check if ball hits it. If it does => explode
         // var circumference = ((2) * (Math.PI) * (r)); => r = Radius
