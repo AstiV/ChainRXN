@@ -12,7 +12,8 @@ var Game = function() {
                     ball.move();
                 });
             }.bind(this),
-            25
+            // => perfect speed: 25
+            500
         );
     };
 };
@@ -58,7 +59,10 @@ var Ball = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
 
         this.changeLeft();
         this.changeTop();
-
+        console.log("SMALL DOT", {
+            x: this.left - 5,
+            y: this.top - 5
+        });
         this.selector.css({
             top: this.top + "px",
             left: this.left + "px"
@@ -70,18 +74,18 @@ $(document).ready(function() {
     var game = new Game();
 
     var b = new Ball();
-    var bTwo = new Ball(50, 100, 0.4, 2.1);
-    game.addBall(new Ball(36, 500, 0.5, 1.3));
-    game.addBall(new Ball(100, 500, 0.7, 4.3));
-    game.addBall(new Ball(100, 100, 0.6, 2.2));
+    // var bTwo = new Ball(50, 100, 0.4, 2.1);
+    // game.addBall(new Ball(36, 500, 0.5, 1.3));
+    // game.addBall(new Ball(100, 500, 0.7, 4.3));
+    // game.addBall(new Ball(100, 100, 0.6, 2.2));
     game.addBall(b);
-    game.addBall(bTwo);
 
     game.start();
 
     // didn't work with clickerBool variable declaration within click function
     // right above if statement => WHY???
     var clickerBool = true;
+    var ballCoordinates;
 
     // If user clicks game area, make big explosive ball ("user-click") appear
     $("#game").click(function(event) {
@@ -107,50 +111,80 @@ $(document).ready(function() {
         }
         clickerBool = false;
         // console.log("clickerBool after if else " + clickerBool);
+
         setInterval(function() {
-            var nextVar = document.getElementsByClassName("user-click")[0].getBoundingClientRect();
-            console.log(nextVar);
-        }, 200);
-        console.log(game.balls);
-        // remember to do if statement and let setInterval only check for width, if clicker ball exists!!!!
+            // inspect of clicker element shows, that element is growing - but not css values
+            // console.log of clicker element to research which properties it has - offsetWidth might be what to look for
+            // offsetWidth only returns defult values => use getBoundingClientRect
+            ballCoordinates = document.getElementsByClassName("user-click")[0].getBoundingClientRect();
+            console.log(ballCoordinates);
+            // store circumference of clicker ball in real-time
+            // var circumference = ((2) * (Math.PI) * (r)); => r = Radius
+            var radius = ballCoordinates.width / 2;
+            var absoluteX = ballCoordinates.left + radius;
+            var absoluteY = ballCoordinates.top + radius;
+            console.log("ABSOLUTE X", absoluteX);
+            console.log("ABSOLUTE Y", absoluteY);
+            console.log("Radius: " + radius);
+            var circumference = 2 * Math.PI * radius;
+            // console.log("Circumference: " + circumference);
+
+            // check for overlapping balls
+            var overlap = overlappingBallsCheck(
+                absoluteX,
+                absoluteY,
+                b.left - 10,
+                b.top - 10,
+                radius,
+                10
+            );
+            // console.log("Overlap " + overlap);
+            if (overlap === 1) {
+                console.log("Balls touch!");
+            } else if (overlap < 1) {
+                console.log("No touch, so far!");
+            } else {
+                console.log("Balls overlap!");
+            }
+        }, 500);
+
+        // All small balls are in the array game! console.log(game.balls);
+        var gameBalls = game.balls;
+
+        setInterval(function() {
+            gameBalls.forEach(function(ball) {});
+        });
+        // TODO if statement that lets setInterval only check for width, if clicker ball exists!!!!
         // if it exists, check for coordinates and check if small ball collides
         // if yes, then make small ball grow
         // check if other ball collides...
-        // All small balls are in the array game!
-        //
-
-        // var nextVar = clickerDiv.getBoundingClientRect();
 
         // Animate clicker ball to grow
         var clickerStyle = $(".user-click");
         setTimeout(function() {
             clickerStyle.toggleClass("grow");
-            // clickerDiv.getBoundingClientRect();
-            // var rect = clicker.getBBox();
-            // console.log(rect);
         }, 20);
         setTimeout(function() {
             clickerStyle.toggleClass("grow");
-            // clickerDiv.getBoundingClientRect();
-            // var rect = clicker.getBBox();
-            // console.log(rect);
         }, 8000);
         setTimeout(function() {
             clickerStyle.toggleClass("fade-out");
             // clickerStyle.remove();
-            // clickerDiv.getBoundingClientRect();
-            // var rect = clicker.getBBox();
-            // console.log(rect);
         }, 10500);
-        // clickerDiv.getBoundingClientRect();
-
-        // inspect of clicker element shows, that element is growing - but not css values
-        // console.log of clicker element to research which properties it has - offsetWidth might be what to look for
-
-        // store circumference of clicker in real-time, to check if ball hits it. If it does => explode
-        // var circumference = ((2) * (Math.PI) * (r)); => r = Radius
-        // radius = width/2
-        // How to get dynamic width? => getBoundingClientRect() => does not work
-        // console.log(clicker.getBoundingClientRect());
     });
 });
+
+// check if small ball and clicked ball overlap
+// https://www.geeksforgeeks.org/check-two-given-circles-touch-intersect/
+
+function overlappingBallsCheck(x1, y1, x2, y2, r1, r2) {
+    var distSq = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+    console.log("DistSq " + distSq);
+    var radSumSq = (r1 + r2) * (r1 + r2);
+    console.log("radSumSq: " + radSumSq);
+    if (distSq === radSumSq) {
+        return 1;
+    } else if (distSq > radSumSq) {
+        return -1;
+    } else return 0;
+}
