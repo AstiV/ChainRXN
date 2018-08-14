@@ -1,0 +1,135 @@
+var Game = function() {
+    this.balls = [];
+
+    this.addBall = function(ball) {
+        this.balls.push(ball);
+    };
+
+    this.start = function() {
+        setInterval(
+            function() {
+                this.balls.forEach(function(ball) {
+                    ball.move();
+                });
+            }.bind(this),
+            25
+        );
+    };
+};
+
+var Ball = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
+    this.left = left;
+    this.top = top;
+
+    this.selector = $('<div class="ball"></div>');
+    $("#game").append(this.selector);
+
+    this.changeTop = function() {
+        this.top += yRatio;
+    };
+
+    this.changeLeft = function() {
+        this.left += xRatio;
+    };
+
+    this.move = function() {
+        if (this.top > 620) {
+            this.changeTop = function() {
+                this.top -= yRatio;
+            };
+        }
+        if (this.top < 0) {
+            this.changeTop = function() {
+                this.top += yRatio;
+            };
+        }
+
+        if (this.left > 620) {
+            this.changeLeft = function() {
+                this.left -= xRatio;
+            };
+        }
+
+        if (this.left < 0) {
+            this.changeLeft = function() {
+                this.left += xRatio;
+            };
+        }
+
+        this.changeLeft();
+        this.changeTop();
+
+        this.selector.css({
+            top: this.top + "px",
+            left: this.left + "px"
+        });
+    };
+};
+
+$(document).ready(function() {
+    var game = new Game();
+
+    var b = new Ball();
+    var bTwo = new Ball(50, 100, 0.4, 2.1);
+    game.addBall(new Ball(36, 500, 0.5, 1.3));
+    game.addBall(new Ball(100, 500, 0.7, 4.3));
+    game.addBall(new Ball(100, 100, 0.6, 2.2));
+    game.addBall(b);
+    game.addBall(bTwo);
+
+    game.start();
+
+    // didn't work with clickerBool variable declaration within click function
+    // right above if statement => WHY???
+    var clickerBool = true;
+
+    // If user clicks game area, make big explosive ball ("user-click") appear
+    $("#game").click(function(event) {
+        console.log(event);
+        // get mouse coordinate
+        console.log("pageX: " + event.offsetY + ", pageY: " + event.offsetX);
+        // append div into html, only if no clicker exists, yet!
+
+        // console.log("clickerBool before if else " + clickerBool);
+        if (clickerBool === true) {
+            // append div into html
+            var clicker = $('<div class="user-click"></div>');
+            clicker.css({
+                // substract 10, because of the radius of the ball!
+                // TODO - Access width/height of css to make it dynamic!
+                top: event.offsetY - 10 + "px",
+                left: event.offsetX - 10 + "px"
+            });
+            $("#game").append(clicker);
+            // set clickerBool to false, to prevent further creation of "user-clicks"
+            clickerBool = false;
+            // console.log("clickerBool within if else " + clickerBool);
+        }
+        clickerBool = false;
+        // console.log("clickerBool after if else " + clickerBool);
+
+        // Animate clicker ball to grow
+        var clicker = $(".user-click");
+        setTimeout(function() {
+            clicker.toggleClass("grow");
+            var rect = clicker.getBBox();
+            console.log(rect);
+        }, 20);
+        setTimeout(function() {
+            clicker.toggleClass("grow");
+            var rect = clicker.getBBox();
+            console.log(rect);
+        }, 8000);
+        setTimeout(function() {
+            clicker.toggleClass("fade-out");
+            var rect = clicker.getBBox();
+            console.log(rect);
+        }, 10500);
+
+        // store circumference of clicker in real-time, to check if ball hits it. If it does => explode
+        // var circumference = ((2) * (Math.PI) * (r)); => r = Radius
+        // radius = width/2
+        // How to get dynamic width? => getBoundingClientRect() => does not work
+        // console.log(clicker.getBoundingClientRect());
+    });
+});
