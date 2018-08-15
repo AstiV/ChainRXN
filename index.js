@@ -88,62 +88,35 @@ $(document).ready(function() {
     var ballCoordinates;
     var overlap;
 
-    // If user clicks game area, make big explosive ball ("user-click") appear
+    // If user clicks game area, make big explosive circle ("user-click") appear
     $("#game").click(function(event) {
         createClickCircle();
+        animateCircle();
 
         setInterval(function() {
-            // offsetWidth only returns defult values => use getBoundingClientRect
-            ballCoordinates = document.getElementsByClassName("user-click")[0].getBoundingClientRect();
-            // store coordinates of Circle in real-time
-            var radius = ballCoordinates.width / 2;
-            var absoluteX = ballCoordinates.left + radius;
-            var absoluteY = ballCoordinates.top + radius;
-            // check for overlapping circles
-            var overlap = overlappingCirclesCheck(
-                absoluteX,
-                absoluteY,
-                b.left - 5,
-                b.top - 5,
-                radius,
-                5
-            );
-            // console.log("Overlap " + overlap);
-            if (overlap === 1) {
-                console.log(overlap);
-                console.log("Circles touch!");
-            } else if (overlap < 0) {
-                console.log(overlap);
-                console.log("No touch, so far!");
-            } else {
-                console.log(overlap);
-                console.log("Circles overlap!");
-            }
+            getCircleCoordinates();
+
+            // // check for overlapping circles
+            // var overlap = overlappingCirclesCheck(
+            //     absoluteX,
+            //     absoluteY,
+            //     b.left - 5,
+            //     b.top - 5,
+            //     radius,
+            //     5
+            // );
+            // // console.log("Overlap " + overlap);
+            // if (overlap === 1) {
+            //     console.log(overlap);
+            //     console.log("Circles touch!");
+            // } else if (overlap < 0) {
+            //     console.log(overlap);
+            //     console.log("No touch, so far!");
+            // } else {
+            //     console.log(overlap);
+            //     console.log("Circles overlap!");
+            // }
         }, 500);
-
-        // All small balls are in the array game! console.log(game.balls);
-        var gameBalls = game.balls;
-
-        setInterval(function() {
-            gameBalls.forEach(function(ball) {});
-        });
-        // TODO if statement that lets setInterval only check for width, if clicker ball exists!!!!
-        // if it exists, check for coordinates and check if small ball collides
-        // if yes, then make small ball grow
-        // check if other ball collides...
-
-        // Animate clicker ball to grow
-        var clickerStyle = $(".user-click");
-        setTimeout(function() {
-            clickerStyle.toggleClass("grow");
-        }, 20);
-        setTimeout(function() {
-            clickerStyle.toggleClass("grow");
-        }, 8000);
-        setTimeout(function() {
-            clickerStyle.toggleClass("fade-out");
-            // clickerStyle.remove();
-        }, 10500);
     });
 });
 
@@ -165,6 +138,37 @@ function createClickCircle() {
     return (clickerBool = false);
 }
 
+function getCircleCoordinates() {
+    // offsetWidth only returns defult values => use getBoundingClientRect
+    ballCoordinates = document.getElementsByClassName("user-click")[0].getBoundingClientRect();
+    // store coordinates of Circle in real-time
+    var radius = ballCoordinates.width / 2;
+    var absoluteX = ballCoordinates.left + radius;
+    var absoluteY = ballCoordinates.top + radius;
+    var coordinates = {
+        absoluteX: absoluteX,
+        absoluteY: absoluteY,
+        radius: radius
+    };
+    console.log(coordinates);
+    return coordinates;
+}
+
+function animateCircle() {
+    // Animate clicker ball to grow
+    var clickerStyle = $(".user-click");
+    setTimeout(function() {
+        clickerStyle.toggleClass("grow");
+    }, 20);
+    setTimeout(function() {
+        clickerStyle.toggleClass("grow");
+    }, 8000);
+    setTimeout(function() {
+        clickerStyle.toggleClass("fade-out");
+        // clickerStyle.remove();
+    }, 10500);
+}
+
 // check if small ball and clicked circle overlap
 // https://www.geeksforgeeks.org/check-two-given-circles-touch-intersect/
 
@@ -181,3 +185,13 @@ function overlappingCirclesCheck(x1, y1, x2, y2, r1, r2) {
         return -1;
     } else return 0;
 }
+
+// // All small balls are in the array game! console.log(game.balls);
+// var gameBalls = game.balls;
+// setInterval(function() {
+//     gameBalls.forEach(function(ball) {});
+// });
+// // TODO if statement that lets setInterval only check for width, if clicker ball exists!!!!
+// // if it exists, check for coordinates and check if small ball collides
+// // if yes, then make small ball grow
+// // check if other ball collides...
