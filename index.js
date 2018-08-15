@@ -1,15 +1,15 @@
 var Game = function() {
-    this.balls = [];
+    this.dots = [];
 
-    this.addBall = function(ball) {
-        this.balls.push(ball);
+    this.addDot = function(dot) {
+        this.dots.push(dot);
     };
 
     this.start = function() {
         setInterval(
             function() {
-                this.balls.forEach(function(ball) {
-                    ball.move();
+                this.dots.forEach(function(dot) {
+                    dot.move();
                 });
             }.bind(this),
             // => perfect speed: 25
@@ -18,7 +18,7 @@ var Game = function() {
     };
 };
 
-var Ball = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
+var Dot = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
     this.left = left;
     this.top = top;
 
@@ -72,21 +72,20 @@ var Ball = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
 };
 
 var clickerBool = true;
+var circleCoordinates;
+var dotCoordinates;
 
 $(document).ready(function() {
     var game = new Game();
 
-    var b = new Ball();
-    // var bTwo = new Ball(50, 100, 0.4, 2.1);
-    // game.addBall(new Ball(36, 500, 0.5, 1.3));
-    // game.addBall(new Ball(100, 500, 0.7, 4.3));
-    // game.addBall(new Ball(100, 100, 0.6, 2.2));
-    game.addBall(b);
+    var b = new Dot();
+    // var bTwo = new Dot(50, 100, 0.4, 2.1);
+    // game.addDot(new Dot(36, 500, 0.5, 1.3));
+    // game.addDot(new Dot(100, 500, 0.7, 4.3));
+    // game.addDot(new Dot(100, 100, 0.6, 2.2));
+    game.addDot(b);
 
     game.start();
-
-    var ballCoordinates;
-    var overlap;
 
     // If user clicks game area, make big explosive circle ("user-click") appear
     $("#game").click(function(event) {
@@ -94,28 +93,10 @@ $(document).ready(function() {
         animateCircle();
 
         setInterval(function() {
-            getCircleCoordinates();
-
-            // // check for overlapping circles
-            // var overlap = overlappingCirclesCheck(
-            //     absoluteX,
-            //     absoluteY,
-            //     b.left - 5,
-            //     b.top - 5,
-            //     radius,
-            //     5
-            // );
-            // // console.log("Overlap " + overlap);
-            // if (overlap === 1) {
-            //     console.log(overlap);
-            //     console.log("Circles touch!");
-            // } else if (overlap < 0) {
-            //     console.log(overlap);
-            //     console.log("No touch, so far!");
-            // } else {
-            //     console.log(overlap);
-            //     console.log("Circles overlap!");
-            // }
+            circleCoordinates = getCircleCoordinates();
+            dotCoordinates = getDotCoordinates(b);
+            calculateIfOverlap();
+            checkIfOverlap();
         }, 500);
     });
 });
@@ -126,7 +107,7 @@ function createClickCircle() {
     if (clickerBool === true) {
         // append div into html
         clickerDiv.css({
-            // substract 10, because of the radius of the ball!
+            // substract 10, because of the radius of the Circle!
             // TODO - Access width/height of css to make it dynamic!
             top: event.offsetY - 10 + "px",
             left: event.offsetX - 10 + "px"
@@ -138,24 +119,8 @@ function createClickCircle() {
     return (clickerBool = false);
 }
 
-function getCircleCoordinates() {
-    // offsetWidth only returns defult values => use getBoundingClientRect
-    ballCoordinates = document.getElementsByClassName("user-click")[0].getBoundingClientRect();
-    // store coordinates of Circle in real-time
-    var radius = ballCoordinates.width / 2;
-    var absoluteX = ballCoordinates.left + radius;
-    var absoluteY = ballCoordinates.top + radius;
-    var coordinates = {
-        absoluteX: absoluteX,
-        absoluteY: absoluteY,
-        radius: radius
-    };
-    console.log(coordinates);
-    return coordinates;
-}
-
 function animateCircle() {
-    // Animate clicker ball to grow
+    // Animate clicker Circle to grow
     var clickerStyle = $(".user-click");
     setTimeout(function() {
         clickerStyle.toggleClass("grow");
@@ -169,10 +134,37 @@ function animateCircle() {
     }, 10500);
 }
 
+function getCircleCoordinates() {
+    // offsetWidth only returns defult values => use getBoundingClientRect
+    circleCoordinates = document.getElementsByClassName("user-click")[0].getBoundingClientRect();
+    // store coordinates of Circle in real-time
+    var radius = circleCoordinates.width / 2;
+    var absoluteX = circleCoordinates.left + radius;
+    var absoluteY = circleCoordinates.top + radius;
+    var circleCoordinates = {
+        absoluteX: absoluteX,
+        absoluteY: absoluteY,
+        radius: radius
+    };
+    return circleCoordinates;
+}
+
+function getDotCoordinates(dot) {
+    var dotX = dot.left - 5;
+    var dotY = dot.top - 5;
+    var radius = 5;
+    var dotCoordinates = {
+        dotX: dotX,
+        dotY: dotY,
+        radius: radius
+    };
+    return dotCoordinates;
+}
+
 // check if small ball and clicked circle overlap
 // https://www.geeksforgeeks.org/check-two-given-circles-touch-intersect/
 
-function overlappingCirclesCheck(x1, y1, x2, y2, r1, r2) {
+function calculateIfOverlap(x1, y1, x2, y2, r1, r2) {
     var distSq = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
     console.log("distSq " + distSq);
     // console.log("DistSq " + distSq);
@@ -186,7 +178,31 @@ function overlappingCirclesCheck(x1, y1, x2, y2, r1, r2) {
     } else return 0;
 }
 
-// // All small balls are in the array game! console.log(game.balls);
+function checkIfOverlap(circle, dot) {
+    // check for overlapping circles
+    var overlap = calculateIfOverlap(
+        circleCoordinates.absoluteX,
+        circleCoordinates.absoluteY,
+        dotCoordinates.dotX,
+        dotCoordinates.dotY,
+        circleCoordinates.radius,
+        dotCoordinates.radius
+    );
+
+    // console.log("Overlap " + overlap);
+    if (overlap === 1) {
+        console.log(overlap);
+        console.log("Circles touch!");
+    } else if (overlap < 0) {
+        console.log(overlap);
+        console.log("No touch, so far!");
+    } else {
+        console.log(overlap);
+        console.log("Circles overlap!");
+    }
+}
+
+// // All small dots are in the array game! console.log(game.dots);
 // var gameBalls = game.balls;
 // setInterval(function() {
 //     gameBalls.forEach(function(ball) {});
