@@ -6,15 +6,21 @@ var Game = function() {
     };
 
     this.start = function() {
-        setInterval(
+        var startIt = setInterval(
             function() {
                 this.dots.forEach(function(dot) {
                     dot.move();
                 });
             }.bind(this),
             // => perfect speed: 25
-            500
+            250
         );
+    };
+
+    this.stop = function() {
+        if (overlap === 0) {
+            clearInterval(startIt);
+        }
     };
 };
 
@@ -58,6 +64,11 @@ var Dot = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
             };
         }
 
+        // this.stopMoving = function() {
+        //     this.left = dotCoordinates.dotX;
+        //     this.top = dotCoordinates.dotY;
+        // };
+
         this.changeLeft();
         this.changeTop();
         // console.log("SMALL DOT", {
@@ -74,6 +85,7 @@ var Dot = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
 var clickerBool = true;
 var circleCoordinates;
 var dotCoordinates;
+var overlap;
 
 $(document).ready(function() {
     var game = new Game();
@@ -85,7 +97,7 @@ $(document).ready(function() {
     // game.addDot(new Dot(100, 100, 0.6, 2.2));
     game.addDot(b);
 
-    game.start();
+    startIt = game.start();
 
     // If user clicks game area, make big explosive circle ("user-click") appear
     $("#game").click(function(event) {
@@ -99,6 +111,7 @@ $(document).ready(function() {
             checkIfOverlap();
         }, 500);
     });
+    game.stop();
 });
 
 function createClickCircle() {
@@ -199,6 +212,13 @@ function checkIfOverlap(circle, dot) {
     } else {
         console.log(overlap);
         console.log("Circles overlap!");
+        console.log("STOP IT BITCH");
+        // if overlap, clear interval for specific Dot!
+        // var explodingDot = $(".ball");
+
+        // setTimeout(function() {
+        //     explodingDot.toggleClass("grow");
+        // }, 20);
     }
 }
 
