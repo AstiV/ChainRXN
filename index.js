@@ -34,6 +34,7 @@ var Ball = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
     };
 
     this.move = function() {
+        var animate = true;
         if (this.top > 620) {
             this.changeTop = function() {
                 this.top -= yRatio;
@@ -59,16 +60,18 @@ var Ball = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
 
         this.changeLeft();
         this.changeTop();
-        console.log("SMALL DOT", {
-            x: this.left - 5,
-            y: this.top - 5
-        });
+        // console.log("SMALL DOT", {
+        //     x: this.left - 5,
+        //     y: this.top - 5
+        // });
         this.selector.css({
             top: this.top + "px",
             left: this.left + "px"
         });
     };
 };
+
+var clickerBool = true;
 
 $(document).ready(function() {
     var game = new Game();
@@ -82,54 +85,20 @@ $(document).ready(function() {
 
     game.start();
 
-    // didn't work with clickerBool variable declaration within click function
-    // right above if statement => WHY???
-    var clickerBool = true;
     var ballCoordinates;
     var overlap;
 
     // If user clicks game area, make big explosive ball ("user-click") appear
     $("#game").click(function(event) {
-        // console.log(event);
-        // get mouse coordinate
-        // console.log("pageX: " + event.offsetY + ", pageY: " + event.offsetX);
-        // append div into html, only if no clicker exists, yet!
-
-        var clickerDiv = $('<div class="user-click"></div>');
-        // console.log("clickerBool before if else " + clickerBool);
-        if (clickerBool === true) {
-            // append div into html
-            clickerDiv.css({
-                // substract 10, because of the radius of the ball!
-                // TODO - Access width/height of css to make it dynamic!
-                top: event.offsetY - 10 + "px",
-                left: event.offsetX - 10 + "px"
-            });
-            $("#game").append(clickerDiv);
-            // set clickerBool to false, to prevent further creation of "user-clicks"
-            clickerBool = false;
-            // console.log("clickerBool within if else " + clickerBool);
-        }
-        clickerBool = false;
-        // console.log("clickerBool after if else " + clickerBool);
+        createClickCircle();
 
         setInterval(function() {
-            // inspect of clicker element shows, that element is growing - but not css values
-            // console.log of clicker element to research which properties it has - offsetWidth might be what to look for
             // offsetWidth only returns defult values => use getBoundingClientRect
             ballCoordinates = document.getElementsByClassName("user-click")[0].getBoundingClientRect();
-            console.log(ballCoordinates);
-            // store circumference of clicker ball in real-time
-            // var circumference = ((2) * (Math.PI) * (r)); => r = Radius
+            // store coordinates of Circle in real-time
             var radius = ballCoordinates.width / 2;
             var absoluteX = ballCoordinates.left + radius;
             var absoluteY = ballCoordinates.top + radius;
-            console.log("ABSOLUTE X", absoluteX);
-            console.log("ABSOLUTE Y", absoluteY);
-            console.log("Radius: " + radius);
-            var circumference = 2 * Math.PI * radius;
-            // console.log("Circumference: " + circumference);
-
             // check for overlapping circles
             var overlap = overlappingCirclesCheck(
                 absoluteX,
@@ -178,7 +147,25 @@ $(document).ready(function() {
     });
 });
 
-// check if small ball and clicked ball overlap
+function createClickCircle() {
+    // append div into html, only if no clicker exists, yet!
+    var clickerDiv = $('<div class="user-click"></div>');
+    if (clickerBool === true) {
+        // append div into html
+        clickerDiv.css({
+            // substract 10, because of the radius of the ball!
+            // TODO - Access width/height of css to make it dynamic!
+            top: event.offsetY - 10 + "px",
+            left: event.offsetX - 10 + "px"
+        });
+        $("#game").append(clickerDiv);
+        // set clickerBool to false, to prevent further "user-clicks"
+        clickerBool = false;
+    }
+    return (clickerBool = false);
+}
+
+// check if small ball and clicked circle overlap
 // https://www.geeksforgeeks.org/check-two-given-circles-touch-intersect/
 
 function overlappingCirclesCheck(x1, y1, x2, y2, r1, r2) {

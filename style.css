@@ -58,6 +58,7 @@ body {
     height: 20px;
     border-radius: 50%;
     background-color: #d1b1cb;
+    opacity: 0.5;
     position: absolute;
     transition: all 5s ease-in-out;
 }
