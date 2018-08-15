@@ -16,7 +16,7 @@ body {
 }
 
 .btn {
-    width: 15vw;
+    width: 13vw;
     height: 5vh;
     border: 1px solid #ffffff;
     border-radius: 4%;
@@ -35,7 +35,7 @@ body {
     justify-content: center;
     align-items: center;
     background-color: rgb(180, 180, 180);
-    min-height: 100vh;
+    /* min-height: 100vh; */
 }
 #game {
     width: 640px;

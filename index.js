@@ -86,6 +86,7 @@ $(document).ready(function() {
     // right above if statement => WHY???
     var clickerBool = true;
     var ballCoordinates;
+    var overlap;
 
     // If user clicks game area, make big explosive ball ("user-click") appear
     $("#game").click(function(event) {
@@ -129,22 +130,25 @@ $(document).ready(function() {
             var circumference = 2 * Math.PI * radius;
             // console.log("Circumference: " + circumference);
 
-            // check for overlapping balls
-            var overlap = overlappingBallsCheck(
+            // check for overlapping circles
+            var overlap = overlappingCirclesCheck(
                 absoluteX,
                 absoluteY,
-                b.left - 10,
-                b.top - 10,
+                b.left - 5,
+                b.top - 5,
                 radius,
-                10
+                5
             );
             // console.log("Overlap " + overlap);
             if (overlap === 1) {
-                console.log("Balls touch!");
-            } else if (overlap < 1) {
+                console.log(overlap);
+                console.log("Circles touch!");
+            } else if (overlap < 0) {
+                console.log(overlap);
                 console.log("No touch, so far!");
             } else {
-                console.log("Balls overlap!");
+                console.log(overlap);
+                console.log("Circles overlap!");
             }
         }, 500);
 
@@ -177,11 +181,13 @@ $(document).ready(function() {
 // check if small ball and clicked ball overlap
 // https://www.geeksforgeeks.org/check-two-given-circles-touch-intersect/
 
-function overlappingBallsCheck(x1, y1, x2, y2, r1, r2) {
+function overlappingCirclesCheck(x1, y1, x2, y2, r1, r2) {
     var distSq = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
-    console.log("DistSq " + distSq);
+    console.log("distSq " + distSq);
+    // console.log("DistSq " + distSq);
     var radSumSq = (r1 + r2) * (r1 + r2);
-    console.log("radSumSq: " + radSumSq);
+    console.log("radSumSq " + radSumSq);
+    // console.log("radSumSq: " + radSumSq);
     if (distSq === radSumSq) {
         return 1;
     } else if (distSq > radSumSq) {
