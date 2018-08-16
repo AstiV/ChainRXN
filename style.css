@@ -51,6 +51,7 @@ body {
     top: 0;
     left: 0;
     background-color: #4e937a;
+    transition: transform 5s ease-in-out;
 }
 
 .user-click {

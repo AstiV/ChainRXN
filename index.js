@@ -5,16 +5,31 @@ var Game = function() {
         this.dots.push(dot);
     };
 
+    this.transformToCapture = function(index) {
+        var removedArray = this.dots.splice(index, 1);
+        removedArray.forEach(function(dot) {
+            dot.selector.removeClass("ball");
+            dot.selector.addClass("user-click");
+
+            animateCircle(dot.selector);
+        });
+    };
+
     this.start = function() {
         var startIt = setInterval(
             function() {
-                this.dots.forEach(function(dot) {
-                    if (dot.hit === false) {
-                        dot.move();
-                    } else {
-                        dot.animate();
-                    }
-                });
+                this.dots.forEach(
+                    function(dot, index) {
+                        if (dot.hit === false) {
+                            dot.move();
+                        } else {
+                            this.transformToCapture(index);
+                        }
+                    }.bind(this)
+                );
+
+                // check if there are capturers left
+                // if(!Array.from($('.user-click')).length)
             }.bind(this),
             // => perfect speed: 25
             100
@@ -40,6 +55,7 @@ var Dot = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
 
     this.move = function() {
         var animate = true;
+
         if (this.top > 620) {
             this.changeTop = function() {
                 this.top -= yRatio;
@@ -65,29 +81,11 @@ var Dot = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
 
         this.changeLeft();
         this.changeTop();
-        // console.log("SMALL DOT", {
-        //     x: this.left - 5,
-        //     y: this.top - 5
-        // });
+
         this.selector.css({
             top: this.top + "px",
             left: this.left + "px"
         });
-    };
-
-    this.animate = function() {
-        console.log(this);
-        var dotStyle = $(this);
-        setTimeout(function() {
-            dotStyle.toggleClass("grow");
-        }, 20);
-        setTimeout(function() {
-            dotStyle.toggleClass("grow");
-        }, 8000);
-        setTimeout(function() {
-            dotStyle.toggleClass("fade-out");
-            // clickerStyle.remove();
-        }, 10500);
     };
 };
 
@@ -95,29 +93,30 @@ var clickerBool = true;
 var circleCoordinates;
 var dotCoordinates;
 var overlap;
+var clicked = false;
 
 $(document).ready(function() {
     var game = new Game();
 
-    var b = new Dot();
-    // var bTwo = new Dot(50, 100, 0.4, 2.1);
+    game.addDot(new Dot());
     game.addDot(new Dot(36, 500, 0.5, 1.3));
     game.addDot(new Dot(100, 500, 0.7, 4.3));
     game.addDot(new Dot(100, 100, 0.6, 2.2));
-    game.addDot(b);
 
     startIt = game.start();
 
     // If user clicks game area, make big explosive circle ("user-click") appear
     $("#game").click(function(event) {
+        if (clicked) return;
+
+        clicked = true;
+
         createClickCircle();
-        animateCircle();
+        animateCircle($(".user-click"));
 
         setInterval(function() {
-            circleCoordinates = getCircleCoordinates();
             game.dots.forEach(function(dot) {
-                dotCoordinates = getDotCoordinates(dot);
-                checkIfOverlap(dotCoordinates, dot);
+                checkIfOverlap(dot);
             });
         }, 50);
     });
@@ -141,24 +140,29 @@ function createClickCircle() {
     return (clickerBool = false);
 }
 
-function animateCircle() {
+function animateCircle(selector) {
     // Animate clicker Circle to grow
-    var clickerStyle = $(".user-click");
+
     setTimeout(function() {
-        clickerStyle.toggleClass("grow");
+        selector.toggleClass("grow");
     }, 20);
+
     setTimeout(function() {
-        clickerStyle.toggleClass("grow");
+        selector.toggleClass("grow");
     }, 8000);
+
     setTimeout(function() {
-        clickerStyle.toggleClass("fade-out");
-        // clickerStyle.remove();
+        selector.toggleClass("fade-out");
     }, 10500);
+
+    setTimeout(function() {
+        selector.remove();
+    }, 12500);
 }
 
-function getCircleCoordinates() {
+function getCircleCoordinates(capturer) {
     // offsetWidth only returns defult values => use getBoundingClientRect
-    circleCoordinates = document.getElementsByClassName("user-click")[0].getBoundingClientRect();
+    circleCoordinates = capturer.getBoundingClientRect();
     // store coordinates of Circle in real-time
     var radius = circleCoordinates.width / 2;
     var absoluteX = circleCoordinates.left + radius;
@@ -188,10 +192,8 @@ function getDotCoordinates(dot) {
 
 function calculateIfOverlap(x1, y1, x2, y2, r1, r2) {
     var distSq = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
-    console.log("distSq " + distSq);
     // console.log("DistSq " + distSq);
     var radSumSq = (r1 + r2) * (r1 + r2);
-    console.log("radSumSq " + radSumSq);
     // console.log("radSumSq: " + radSumSq);
     if (distSq === radSumSq) {
         return 1;
@@ -200,29 +202,35 @@ function calculateIfOverlap(x1, y1, x2, y2, r1, r2) {
     } else return 0;
 }
 
-function checkIfOverlap(dotCoordinates, dot) {
-    // check for overlapping circles
-    var overlap = calculateIfOverlap(
-        circleCoordinates.absoluteX,
-        circleCoordinates.absoluteY,
-        dotCoordinates.dotX,
-        dotCoordinates.dotY,
-        circleCoordinates.radius,
-        dotCoordinates.radius
-    );
+function checkIfOverlap(dot) {
+    var dotCoordinates = getDotCoordinates(dot);
 
-    // console.log("Overlap " + overlap);
-    if (overlap === 1) {
-        console.log(overlap);
-        console.log("Circles touch!");
-    } else if (overlap < 0) {
-        console.log(overlap);
-        console.log("No touch, so far!");
-    } else {
-        console.log(overlap);
-        console.log("Circles overlap!");
-        dot.hit = true;
-    }
+    Array.from($(".user-click")).forEach(function(capturer) {
+        var circleCoordinates = getCircleCoordinates(capturer);
+
+        // check for overlapping circles
+        var overlap = calculateIfOverlap(
+            circleCoordinates.absoluteX,
+            circleCoordinates.absoluteY,
+            dotCoordinates.dotX,
+            dotCoordinates.dotY,
+            circleCoordinates.radius,
+            dotCoordinates.radius
+        );
+
+        // console.log("Overlap " + overlap);
+        if (overlap === 1) {
+            // console.log(overlap);
+            // console.log("Circles touch!");
+        } else if (overlap < 0) {
+            // console.log(overlap);
+            // console.log("No touch, so far!");
+        } else {
+            // console.log(overlap);
+            // console.log("Circles overlap!");
+            dot.hit = true;
+        }
+    });
 }
 
 // // All small dots are in the array game! console.log(game.dots);
