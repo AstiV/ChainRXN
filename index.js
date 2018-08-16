@@ -9,24 +9,23 @@ var Game = function() {
         var startIt = setInterval(
             function() {
                 this.dots.forEach(function(dot) {
-                    dot.move();
+                    if (dot.hit === false) {
+                        dot.move();
+                    } else {
+                        dot.animate();
+                    }
                 });
             }.bind(this),
             // => perfect speed: 25
-            250
+            100
         );
-    };
-
-    this.stop = function() {
-        if (overlap === 0) {
-            clearInterval(startIt);
-        }
     };
 };
 
 var Dot = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
     this.left = left;
     this.top = top;
+    this.hit = false;
 
     this.selector = $('<div class="ball"></div>');
     $("#game").append(this.selector);
@@ -64,11 +63,6 @@ var Dot = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
             };
         }
 
-        // this.stopMoving = function() {
-        //     this.left = dotCoordinates.dotX;
-        //     this.top = dotCoordinates.dotY;
-        // };
-
         this.changeLeft();
         this.changeTop();
         // console.log("SMALL DOT", {
@@ -79,6 +73,21 @@ var Dot = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
             top: this.top + "px",
             left: this.left + "px"
         });
+    };
+
+    this.animate = function() {
+        console.log(this);
+        var dotStyle = $(this);
+        setTimeout(function() {
+            dotStyle.toggleClass("grow");
+        }, 20);
+        setTimeout(function() {
+            dotStyle.toggleClass("grow");
+        }, 8000);
+        setTimeout(function() {
+            dotStyle.toggleClass("fade-out");
+            // clickerStyle.remove();
+        }, 10500);
     };
 };
 
@@ -92,9 +101,9 @@ $(document).ready(function() {
 
     var b = new Dot();
     // var bTwo = new Dot(50, 100, 0.4, 2.1);
-    // game.addDot(new Dot(36, 500, 0.5, 1.3));
-    // game.addDot(new Dot(100, 500, 0.7, 4.3));
-    // game.addDot(new Dot(100, 100, 0.6, 2.2));
+    game.addDot(new Dot(36, 500, 0.5, 1.3));
+    game.addDot(new Dot(100, 500, 0.7, 4.3));
+    game.addDot(new Dot(100, 100, 0.6, 2.2));
     game.addDot(b);
 
     startIt = game.start();
@@ -106,12 +115,12 @@ $(document).ready(function() {
 
         setInterval(function() {
             circleCoordinates = getCircleCoordinates();
-            dotCoordinates = getDotCoordinates(b);
-            calculateIfOverlap();
-            checkIfOverlap();
-        }, 500);
+            game.dots.forEach(function(dot) {
+                dotCoordinates = getDotCoordinates(dot);
+                checkIfOverlap(dotCoordinates, dot);
+            });
+        }, 50);
     });
-    game.stop();
 });
 
 function createClickCircle() {
@@ -191,7 +200,7 @@ function calculateIfOverlap(x1, y1, x2, y2, r1, r2) {
     } else return 0;
 }
 
-function checkIfOverlap(circle, dot) {
+function checkIfOverlap(dotCoordinates, dot) {
     // check for overlapping circles
     var overlap = calculateIfOverlap(
         circleCoordinates.absoluteX,
@@ -212,13 +221,7 @@ function checkIfOverlap(circle, dot) {
     } else {
         console.log(overlap);
         console.log("Circles overlap!");
-        console.log("STOP IT BITCH");
-        // if overlap, clear interval for specific Dot!
-        // var explodingDot = $(".ball");
-
-        // setTimeout(function() {
-        //     explodingDot.toggleClass("grow");
-        // }, 20);
+        dot.hit = true;
     }
 }
 
