@@ -32,12 +32,12 @@ var Game = function() {
                 // if(!Array.from($('.user-click')).length)
             }.bind(this),
             // => perfect speed: 25
-            100
+            13
         );
     };
 };
 
-var Dot = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
+var Dot = function(left = 1, top = 1, xRatio = 0.2, yRatio = 0.3) {
     this.left = left;
     this.top = top;
     this.hit = false;
@@ -89,7 +89,6 @@ var Dot = function(left = 1, top = 1, xRatio = 1, yRatio = 3.5) {
     };
 };
 
-var clickerBool = true;
 var circleCoordinates;
 var dotCoordinates;
 var overlap;
@@ -98,10 +97,9 @@ var clicked = false;
 $(document).ready(function() {
     var game = new Game();
 
-    game.addDot(new Dot());
-    game.addDot(new Dot(36, 500, 0.5, 1.3));
-    game.addDot(new Dot(100, 500, 0.7, 4.3));
-    game.addDot(new Dot(100, 100, 0.6, 2.2));
+    game.addDot(new Dot(0, 0, 2.0, 2.0));
+    game.addDot(new Dot(0, 0, 1.0, 1.5));
+    game.addDot(new Dot(0, 0, 1.5, 2.5));
 
     startIt = game.start();
 
@@ -125,19 +123,14 @@ $(document).ready(function() {
 function createClickCircle() {
     // append div into html, only if no clicker exists, yet!
     var clickerDiv = $('<div class="user-click"></div>');
-    if (clickerBool === true) {
-        // append div into html
-        clickerDiv.css({
-            // substract 10, because of the radius of the Circle!
-            // TODO - Access width/height of css to make it dynamic!
-            top: event.offsetY - 10 + "px",
-            left: event.offsetX - 10 + "px"
-        });
-        $("#game").append(clickerDiv);
-        // set clickerBool to false, to prevent further "user-clicks"
-        clickerBool = false;
-    }
-    return (clickerBool = false);
+    // append div into html
+    clickerDiv.css({
+        // substract 10, because of the radius of the Circle!
+        // TODO - Access width/height of css to make it dynamic!
+        top: event.offsetY - 10 + "px",
+        left: event.offsetX - 10 + "px"
+    });
+    $("#game").append(clickerDiv);
 }
 
 function animateCircle(selector) {
@@ -162,11 +155,12 @@ function animateCircle(selector) {
 
 function getCircleCoordinates(capturer) {
     // offsetWidth only returns defult values => use getBoundingClientRect
-    circleCoordinates = capturer.getBoundingClientRect();
+    var coords = capturer.getBoundingClientRect();
     // store coordinates of Circle in real-time
-    var radius = circleCoordinates.width / 2;
-    var absoluteX = circleCoordinates.left + radius;
-    var absoluteY = circleCoordinates.top + radius;
+    var radius = coords.width / 2;
+    var absoluteX = coords.left + radius;
+    var absoluteY = coords.top + radius;
+
     var circleCoordinates = {
         absoluteX: absoluteX,
         absoluteY: absoluteY,
@@ -176,12 +170,14 @@ function getCircleCoordinates(capturer) {
 }
 
 function getDotCoordinates(dot) {
-    var dotX = dot.left - 5;
-    var dotY = dot.top - 5;
-    var radius = 5;
+    var coords = dot.selector[0].getBoundingClientRect();
+    var radius = coords.width / 2;
+    var absoluteX = coords.left + radius;
+    var absoluteY = coords.top + radius;
+
     var dotCoordinates = {
-        dotX: dotX,
-        dotY: dotY,
+        dotX: absoluteX,
+        dotY: absoluteY,
         radius: radius
     };
     return dotCoordinates;
@@ -232,13 +228,3 @@ function checkIfOverlap(dot) {
         }
     });
 }
-
-// // All small dots are in the array game! console.log(game.dots);
-// var gameBalls = game.balls;
-// setInterval(function() {
-//     gameBalls.forEach(function(ball) {});
-// });
-// // TODO if statement that lets setInterval only check for width, if clicker ball exists!!!!
-// // if it exists, check for coordinates and check if small ball collides
-// // if yes, then make small ball grow
-// // check if other ball collides...
