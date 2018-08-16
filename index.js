@@ -1,105 +1,18 @@
-var Game = function() {
-    this.dots = [];
-
-    this.addDot = function(dot) {
-        this.dots.push(dot);
-    };
-
-    this.transformToCapture = function(index) {
-        var removedArray = this.dots.splice(index, 1);
-        removedArray.forEach(function(dot) {
-            dot.selector.removeClass("ball");
-            dot.selector.addClass("user-click");
-
-            animateCircle(dot.selector);
-        });
-    };
-
-    this.start = function() {
-        var startIt = setInterval(
-            function() {
-                this.dots.forEach(
-                    function(dot, index) {
-                        if (dot.hit === false) {
-                            dot.move();
-                        } else {
-                            this.transformToCapture(index);
-                        }
-                    }.bind(this)
-                );
-
-                // check if there are capturers left
-                // if(!Array.from($('.user-click')).length)
-            }.bind(this),
-            // => perfect speed: 25
-            13
-        );
-    };
-};
-
-var Dot = function(left = 1, top = 1, xRatio = 0.2, yRatio = 0.3) {
-    this.left = left;
-    this.top = top;
-    this.hit = false;
-
-    this.selector = $('<div class="ball"></div>');
-    $("#game").append(this.selector);
-
-    this.changeTop = function() {
-        this.top += yRatio;
-    };
-
-    this.changeLeft = function() {
-        this.left += xRatio;
-    };
-
-    this.move = function() {
-        var animate = true;
-
-        if (this.top > 620) {
-            this.changeTop = function() {
-                this.top -= yRatio;
-            };
-        }
-        if (this.top < 0) {
-            this.changeTop = function() {
-                this.top += yRatio;
-            };
-        }
-
-        if (this.left > 620) {
-            this.changeLeft = function() {
-                this.left -= xRatio;
-            };
-        }
-
-        if (this.left < 0) {
-            this.changeLeft = function() {
-                this.left += xRatio;
-            };
-        }
-
-        this.changeLeft();
-        this.changeTop();
-
-        this.selector.css({
-            top: this.top + "px",
-            left: this.left + "px"
-        });
-    };
-};
-
 var circleCoordinates;
 var dotCoordinates;
 var overlap;
 var clicked = false;
+var gameLost = false;
+var gameWon = false;
 
 $(document).ready(function() {
     var game = new Game();
 
-    game.addDot(new Dot(0, 0, 2.0, 2.0));
+    game.addDot(new Dot(0, 0, 1.0, 0.4));
+    game.addDot(new Dot(0, 0, 0.5, 0.6));
     game.addDot(new Dot(0, 0, 1.0, 1.5));
-    game.addDot(new Dot(0, 0, 1.5, 2.5));
+    game.addDot(new Dot(5, 0, 0.3, 0.5));
+    game.addDot(new Dot(2, 0, 0.2, 1.5));
 
     startIt = game.start();
 
@@ -108,7 +21,7 @@ $(document).ready(function() {
         if (clicked) return;
 
         clicked = true;
-
+        game.started = true;
         createClickCircle();
         animateCircle($(".user-click"));
 
@@ -228,3 +141,37 @@ function checkIfOverlap(dot) {
         }
     });
 }
+
+///// Start Screen
+$(".lost-headline").hide();
+$(".won-headline").hide();
+$(".lost-text").hide();
+$(".won-text").hide();
+$(".again-btn-text").hide();
+
+//// End Screen
+// if ((gameLost = true)) {
+//     // $(".start-container").slideDown();
+//     $(".start-headline").hide();
+//     $(".won-headline").hide();
+//     $(".start-text").hide();
+//     $(".won-text").hide();
+//     $(".start-btn-text").hide();
+// } else if ((gameWon = true)) {
+//     // $(".start-container").slideDown();
+//     $(".start-headline").hide();
+//     $(".lost-headline").hide();
+//     $(".start-text").hide();
+//     $(".lost-text").hide();
+//     $(".start-btn-text").hide();
+// } else {
+//     $(".lost-headline").hide();
+//     $(".won-headline").hide();
+//     $(".lost-text").hide();
+//     $(".won-text").hide();
+//     $(".again-btn-text").hide();
+// }
+
+$(".start-container .btn").click(function() {
+    $(".start-container").slideUp();
+});
