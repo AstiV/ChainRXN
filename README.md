@@ -1,3 +1,6 @@
+![Screenshot of Game](https://github.com/AstiV/ChainRXN/blob/master/images/Screenshot.png)
+
+
 # Game idea
 
 The goal of this game is to make as many balls explode as possible - with just one click per level. The more explosions you generate in a chain reaction - the more points you get. Easy!
