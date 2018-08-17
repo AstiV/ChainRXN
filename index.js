@@ -12,6 +12,10 @@ $(document).ready(function() {
 
     // Show Start Screen
     StartScreen();
+    windowHeight = $(window).height();
+    // $("html, .start-container")
+    //     .stop()
+    //     .animate({ scrollTop: windowHeight }, "slow");
     $(".start-container .btn").click(function() {
         $(".start-container").slideUp();
         game.setLevel(level);
