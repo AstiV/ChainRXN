@@ -78,7 +78,7 @@ body {
     background-image: linear-gradient(
         to bottom right,
         rgba(28, 43, 104, 1),
-        rgb(90, 16, 90) /* rgba(246, 214, 161, 1) */
+        rgb(154, 60, 241) /* rgb(128, 2, 139)  */ /* rgba(246, 214, 161, 1) */
     );
 }
 
