@@ -58,8 +58,9 @@ var Game = function() {
                         this.stopGameLost(startIt);
                         var gameLost = true;
                         LostScreen();
-                    } else if (!Array.from($(".user-click")) && this.dots.length === 0) {
-                        this.stopGame(startIt);
+                    } else if (!Array.from($(".user-click")).length && this.dots.length === 0) {
+                        console.log("You won!");
+                        this.stopGameLost(startIt);
                         var gameWon = true;
                         WonScreen();
                     }
