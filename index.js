@@ -4,17 +4,19 @@ var overlap;
 var clicked = false;
 var gameLost = false;
 var gameWon = false;
+var startIt;
+var level = 0;
 
 $(document).ready(function() {
     var game = new Game();
 
-    game.addDot(new Dot(0, 0, 1.0, 0.4));
-    game.addDot(new Dot(0, 0, 0.5, 0.6));
-    game.addDot(new Dot(0, 0, 1.0, 1.5));
-    game.addDot(new Dot(5, 0, 0.3, 0.5));
-    game.addDot(new Dot(2, 0, 0.2, 1.5));
-
-    startIt = game.start();
+    // Show Start Screen
+    StartScreen();
+    $(".start-container .btn").click(function() {
+        $(".start-container").slideUp();
+        game.setLevel(level);
+        startIt = game.start();
+    });
 
     // If user clicks game area, make big explosive circle ("user-click") appear
     $("#game").click(function(event) {
@@ -143,35 +145,43 @@ function checkIfOverlap(dot) {
 }
 
 ///// Start Screen
-$(".lost-headline").hide();
-$(".won-headline").hide();
-$(".lost-text").hide();
-$(".won-text").hide();
-$(".again-btn-text").hide();
+function StartScreen() {
+    $(".lost-headline").hide();
+    $(".won-headline").hide();
+    $(".lost-text").hide();
+    $(".won-text").hide();
+    $(".again-btn-text").hide();
+}
 
 //// End Screen
-// if ((gameLost = true)) {
-//     // $(".start-container").slideDown();
-//     $(".start-headline").hide();
-//     $(".won-headline").hide();
-//     $(".start-text").hide();
-//     $(".won-text").hide();
-//     $(".start-btn-text").hide();
-// } else if ((gameWon = true)) {
-//     // $(".start-container").slideDown();
-//     $(".start-headline").hide();
-//     $(".lost-headline").hide();
-//     $(".start-text").hide();
-//     $(".lost-text").hide();
-//     $(".start-btn-text").hide();
-// } else {
-//     $(".lost-headline").hide();
-//     $(".won-headline").hide();
-//     $(".lost-text").hide();
-//     $(".won-text").hide();
-//     $(".again-btn-text").hide();
-// }
+function LostScreen() {
+    if ((gameLost = true)) {
+        // level = 0;
+        $(".start-container").slideDown();
+        $(".lost-headline").show();
+        $(".start-headline").hide();
+        $(".won-headline").hide();
+        $(".lost-text").show();
+        $(".start-text").hide();
+        $(".won-text").hide();
+        $(".start-btn-text").hide();
+        $(".again-btn-text").show();
+        var gameLost = false;
+    }
+}
 
-$(".start-container .btn").click(function() {
-    $(".start-container").slideUp();
-});
+function WonScreen() {
+    if ((gameWon = true)) {
+        // level++;
+        $(".start-container").slideDown();
+        $(".won-headline").show();
+        $(".start-headline").hide();
+        $(".lost-headline").hide();
+        $(".won-text").show();
+        $(".start-text").hide();
+        $(".lost-text").hide();
+        $(".start-btn-text").hide();
+        $(".again-btn-text").show();
+        var gameWon = false;
+    }
+}

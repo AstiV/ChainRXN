@@ -16,8 +16,27 @@ var Game = function() {
         });
     };
 
+    this.setLevel = function(level) {
+        clicked = false;
+        gameLost = false;
+        gameWon = false;
+
+        this.dots.forEach(function(dot) {
+            dot.selector.remove();
+        });
+        this.dots = [];
+
+        if (level === 0) {
+            this.addDot(new Dot(0, 0, 1.0, 0.4));
+            this.addDot(new Dot(0, 0, 0.5, 0.6));
+            this.addDot(new Dot(0, 0, 1.0, 1.5));
+            this.addDot(new Dot(5, 0, 0.3, 0.5));
+            this.addDot(new Dot(2, 0, 0.2, 1.5));
+        }
+    };
+
     this.start = function() {
-        var startIt = setInterval(
+        return setInterval(
             function() {
                 this.dots.forEach(
                     function(dot, index) {
@@ -36,13 +55,13 @@ var Game = function() {
                 // check if there are capturers left
                 if (clicked === true) {
                     if (!Array.from($(".user-click")).length && this.dots.length > 0) {
-                        console.log("You Lost!");
                         this.stopGameLost(startIt);
                         var gameLost = true;
+                        LostScreen();
                     } else if (!Array.from($(".user-click")) && this.dots.length === 0) {
-                        console.log("You won!");
                         this.stopGame(startIt);
                         var gameWon = true;
+                        WonScreen();
                     }
                 }
             }.bind(this),
