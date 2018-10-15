@@ -94,9 +94,8 @@ body {
     width: 640px;
     height: 640px;
     position: relative;
-    background-color: black;
     border-radius: 10px;
-    /* background-color: rgb(51, 51, 51); */
+    background-color: rgb(51, 51, 51);
 }
 .ball {
     width: 10px;
