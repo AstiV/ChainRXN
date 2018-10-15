@@ -9,9 +9,7 @@ The goal of this game is to make all balls explode - with just one click. Genera
 1. Clone or copy this repository
 2. Open index.html in your favorite Browser
 
-#### To check out the game without cloning
-
-Visit https://astiv.github.io/ChainRXN/
+#### To check out the game without cloning visit https://astiv.github.io/ChainRXN/
 
 # Credit
 
